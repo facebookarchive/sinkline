@@ -1,0 +1,20 @@
+#!/bin/bash
+
+if [[ $TRAVIS_OS_NAME == 'osx' ]]
+then
+  brew update
+  brew install ant
+fi
+
+BUCK_TAG=$(awk -F '/' '{ print $NF }' .buckversion)
+if [[ -n "$BUCK_TAG" ]]
+then
+  git clone --branch "$BUCK_TAG" --depth 1 https://github.com/facebook/buck.git buck-src
+else
+  git clone --depth 1 https://github.com/facebook/buck.git buck-src
+fi
+
+cd buck-src
+
+ant
+touch build/successful-build

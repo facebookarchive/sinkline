@@ -1,0 +1,10 @@
+[cxx]
+  preprocess_mode = combined
+  ldflags = -pthread
+  gtest_dep = //external:gtest
+
+[project]
+  ide = xcode
+
+[buildfile]
+  includes = //script/clang_defs.py

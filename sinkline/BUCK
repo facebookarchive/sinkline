@@ -1,0 +1,86 @@
+"""
+Copyright (c) 2016-present, Facebook, Inc.
+All rights reserved.
+
+This source code is licensed under the MIT-style license found in the
+LICENSE file in the root directory of this source tree. 
+
+"""
+
+load("@fbsource//tools/build_defs:glob_defs.bzl", "subdir_glob")
+
+COMPILER_FLAGS = PLATFORM_COMPILER_FLAGS + [
+    "-pedantic",
+    "-Werror",
+    "-Wno-unused-parameter",
+    "-Wno-undef",
+    # This warning would suck to leave enabled, but is super helpful for
+    # optimization, as it points out wasted space in class/struct layouts.
+    "-Wno-padded",
+]
+
+cxx_library(
+    name = "sinkline",
+    srcs = glob([
+        "src/**/*.cpp",
+        "src/**/*.mm",
+    ]),
+    header_namespace = "sinkline",
+    # @lint-ignore BUCKRESTRICTEDSYNTAX
+    exported_headers = subdir_glob([
+        ("src", "**/*.h"),
+    ]),
+    compiler_flags = COMPILER_FLAGS,
+    tests = [":sinkline_test"],
+    visibility = ["PUBLIC"],
+)
+
+cxx_test(
+    name = "sinkline_test",
+    srcs = glob([
+        "test/**/*.cpp",
+        "test/**/*.mm",
+    ]),
+    headers = glob(["test/**/*.h"]),
+    compiler_flags = COMPILER_FLAGS + [
+        "-Wno-unreachable-code",
+        # For TestCommon.h
+        "-Wno-unknown-pragmas",
+    ],
+    deps = [
+        ":sinkline",
+    ],
+)
+
+# Size benchmarking is currently only supported for OS X.
+SIZE_BENCHMARK_SRCS = glob([
+    "benchmark/size/**/*.cpp",
+    "benchmark/size/**/*.mm",
+])
+
+size_benchmark_locations = ""
+
+# @lint-ignore BUCKRESTRICTEDSYNTAX
+for src in SIZE_BENCHMARK_SRCS:
+    # @lint-ignore BUCKRESTRICTEDSYNTAX
+    import os
+    name = os.path.splitext(os.path.basename(src))[0]
+
+    cxx_library(
+        name = name,
+        srcs = [src],
+        compiler_flags = COMPILER_FLAGS + [
+            "-Wno-unused",
+            "-Wno-missing-prototypes",
+            "-Os",
+        ],
+        deps = [":sinkline"],
+    )
+
+    size_benchmark_locations += "$(location :" + name + "#macosx-x86_64,static) "
+
+genrule(
+    name = "size_benchmarks",
+    out = "size_benchmarks.txt",
+    cmd = "size " + size_benchmark_locations + " | awk 'match($0, /lib[a-zA-Z0-9]+\.a/) { print $5, substr($0, RSTART, RLENGTH) }' > $OUT",
+)

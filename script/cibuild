@@ -1,0 +1,45 @@
+#!/bin/bash
+
+set -x
+
+if [[ -n $(which buck) ]]
+then
+  BUCK=buck
+else
+  BUCK=./buck-src/bin/buck
+fi
+
+INCLUDES=
+
+if [[ -n $CC ]]
+then
+  if [[ $CC == 'clang' ]]
+  then
+    INCLUDES='--config //buildfile.includes=//script/clang_defs.py'
+  else
+    INCLUDES='--config //buildfile.includes=//script/gcc_defs.py'
+  fi
+fi
+
+CC_PATH=$(which ${CC:-cc})
+CXX_PATH=$(which ${CXX:-c++})
+
+# Make Buck a bit less verbose
+export TERM=dumb
+
+$BUCK test \
+  --config "cxx.cpp=$CC_PATH" \
+  --config "cxx.cc=$CC_PATH" \
+  --config "cxx.cxxpp=$CXX_PATH" \
+  --config "cxx.cxx=$CXX_PATH" \
+  $INCLUDES \
+  "//sinkline:sinkline" || exit $?
+
+if [[ -z $TRAVIS_OS_NAME || $TRAVIS_OS_NAME == 'osx' ]]
+then
+  $BUCK build \
+    '//example:GIFList#iphonesimulator-x86_64' \
+    '//example:GIFListImperative#iphonesimulator-x86_64' \
+    //sinkline:size_benchmarks \
+    || exit $?
+fi

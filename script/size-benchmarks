@@ -1,0 +1,4 @@
+#!/bin/bash
+
+buck build //sinkline:size_benchmarks || exit $?
+cat buck-out/gen/sinkline/size_benchmarks/size_benchmarks.txt

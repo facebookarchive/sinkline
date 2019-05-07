@@ -1,0 +1,29 @@
+matrix:
+  include:
+    - os: linux
+      language: cpp
+      compiler: gcc
+    - os: linux
+      language: cpp
+      compiler: clang
+    - os: osx
+      language: cpp
+      compiler: clang
+
+addons:
+ apt:
+   sources:
+   - ubuntu-toolchain-r-test
+   packages:
+   - gcc-4.9
+   - g++-4.9
+
+install:
+  - if [ "$CC" = "gcc" ]; then export CXX="g++-4.9" CC="gcc-4.9"; fi
+  - ./script/bootstrap
+
+script: ./script/cibuild
+
+osx_image: xcode7.2
+notifications:
+  email: false

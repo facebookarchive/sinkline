@@ -1,0 +1,108 @@
+"""
+Copyright (c) 2016-present, Facebook, Inc.
+All rights reserved.
+
+This source code is licensed under the MIT-style license found in the
+LICENSE file in the root directory of this source tree.
+"""
+
+apple_binary(
+    name = "GIFListBinary",
+    srcs = glob([
+        "GIFList/**/*.m",
+        "GIFList/**/*.mm",
+    ]),
+    headers = glob(["GIFList/**/*.h"]),
+    compiler_flags = [
+        "-fobjc-arc",
+        "-Wall",
+        "-Werror",
+    ],
+    frameworks = [
+        "$SDKROOT/System/Library/Frameworks/AVFoundation.framework",
+        "$SDKROOT/System/Library/Frameworks/CoreMedia.framework",
+        "$SDKROOT/System/Library/Frameworks/Foundation.framework",
+        "$SDKROOT/System/Library/Frameworks/UIKit.framework",
+    ],
+    lang_preprocessor_flags = {
+        "CXX": [
+            "-std=c++14",
+            "-stdlib=libc++",
+        ],
+        "OBJCXX": [
+            "-std=c++14",
+            "-stdlib=libc++",
+        ],
+    },
+    preprocessor_flags = [
+        "-DUSE_SINKLINE=1",
+    ],
+    deps = [
+        "//sinkline:sinkline",
+    ],
+)
+
+apple_resource(
+    name = "GIFListResources",
+    dirs = [
+    ],
+    files = glob([
+        "GIFList/**/*.storyboard",
+    ]),
+)
+
+apple_bundle(
+    name = "GIFList",
+    binary = ":GIFListBinary",
+    extension = "app",
+    info_plist = "GIFList/Info.plist",
+    info_plist_substitutions = {
+        "PRODUCT_BUNDLE_IDENTIFIER": "com.facebook.sinkline.GIFList",
+    },
+    deps = [
+        ":GIFListResources",
+    ],
+)
+
+apple_binary(
+    name = "GIFListImperativeBinary",
+    srcs = glob([
+        "GIFList/**/*.m",
+        "GIFList/**/*.mm",
+    ]),
+    headers = glob(["GIFList/**/*.h"]),
+    compiler_flags = [
+        "-fobjc-arc",
+        "-Wall",
+        "-Werror",
+    ],
+    frameworks = [
+        "$SDKROOT/System/Library/Frameworks/AVFoundation.framework",
+        "$SDKROOT/System/Library/Frameworks/CoreMedia.framework",
+        "$SDKROOT/System/Library/Frameworks/Foundation.framework",
+        "$SDKROOT/System/Library/Frameworks/UIKit.framework",
+    ],
+    lang_preprocessor_flags = {
+        "CXX": [
+            "-std=c++14",
+            "-stdlib=libc++",
+        ],
+        "OBJCXX": [
+            "-std=c++14",
+            "-stdlib=libc++",
+        ],
+    },
+)
+
+apple_bundle(
+    name = "GIFListImperative",
+    binary = ":GIFListImperativeBinary",
+    extension = "app",
+    info_plist = "GIFList/Info.plist",
+    info_plist_substitutions = {
+        "PRODUCT_BUNDLE_IDENTIFIER": "com.facebook.sinkline.GIFListImperative",
+    },
+    deps = [
+        ":GIFListResources",
+    ],
+)

@@ -1,0 +1,42 @@
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Fortran module files
+*.mod
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
+
+# Haskell Cabal files
+.cabal-sandbox
+cabal.sandbox.config
+
+# Buck files
+buck-out/
+buck-src/
+.buckd/
+.nobuckcheck
+
+# Ignore generated Xcode projects and workspaces
+*.xcodeproj
+*.xcworkspace
